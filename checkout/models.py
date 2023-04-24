@@ -32,9 +32,9 @@ class Order(models.Model):
     def update_total(self):
         """
         update grand total each time a line item is added,
-        accounting for the delievry costs
+        accounting for the delivery costs
         """
-        self.order_total = self.lineitems.aggregate(Sum('lineitem_total'))['lineitem_total__sum']
+        self.order_total = self.lineitems.aggregate(Sum('lineitem_total'))['lineitem_total__sum'] or 0
         if self.order_total < settings.FREE_DELIVERY_THRESHOLD:
             self.delivery_cost = self.order_total * settings.STANDARD_DELIVERY_PERCENTAGE / 100
         else:
@@ -47,7 +47,7 @@ class Order(models.Model):
         override the original save method to set the order
         number if it hasnt been set already
         """
-        if not self.orderr_number:
+        if not self.order_number:
             self.order_number = self._generate_order_number()
         super().save(*args, **kwargs)
 
